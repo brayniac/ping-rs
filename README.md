@@ -1,6 +1,6 @@
 # ping-rs - a UDP ASCII ping client with userspace networking
 
-ping-rs is a UDP ASCII ping client which makes use of [librips](httos://github.com/faern/librips) for userspace networking. It provides a basic client with stats to help with benchmarking
+ping-rs is a UDP ASCII ping client which makes use of [librips](https://github.com/faern/librips) for userspace networking. It provides a basic client with stats to help with benchmarking
 
 ## Usage
 

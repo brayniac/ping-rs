@@ -5,10 +5,10 @@ dependencies = [
  "clap 2.12.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "ipnetwork 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "pnet 0.12.0 (git+https://github.com/libpnet/libpnet)",
  "rips 0.0.0 (git+https://github.com/faern/librips)",
  "tic 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "time 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

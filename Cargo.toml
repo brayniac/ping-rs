@@ -3,7 +3,7 @@ name = "ping-rs"
 version = "0.1.0"
 authors = ["Brian Martin <brayniac@gmail.com>"]
 
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0"
 
 description = "UDP ASCII Ping client with userspace networking"
 
@@ -18,8 +18,6 @@ exclude = ["./lib"]
 clap = "^2"
 ipnetwork = "0.9.0"
 lazy_static = "^0.2"
-log = "*"
-pad = "*"
 tic = "0.0.10"
 time = "*"
 

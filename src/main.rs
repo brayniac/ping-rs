@@ -1,19 +1,19 @@
-#[macro_use] extern crate clap;
-#[macro_use] extern crate lazy_static;
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate clap;
+#[macro_use]
+extern crate lazy_static;
 extern crate ipnetwork;
-extern crate pad;
 extern crate pnet;
 extern crate rips;
 extern crate tic;
 extern crate time;
 
-use std::io::{Write};
 use std::fmt;
+use std::io::Write;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::process;
-use std::sync::{Arc, Mutex};
 use std::str::FromStr;
+use std::sync::{Arc, Mutex};
 use std::thread;
 
 use ipnetwork::Ipv4Network;
@@ -88,9 +88,9 @@ fn main() {
     let clocksource = receiver.get_clocksource();
 
     thread::spawn(move || {
-            handle(socket, dst, clocksource, sender);
-        });
-    
+        handle(socket, dst, clocksource, sender);
+    });
+
     let cs = receiver.get_clocksource();
 
     let mut total = 0;
@@ -106,14 +106,29 @@ fn main() {
             total = *t;
         }
         let r = c as f64 / ((t1 - t0) as f64 / 1_000_000_000.0);
-        println!("rate: {} samples per second", r);
+        println!("rate: {} rps", r);
+        println!("latency: p50: {} ns p90: {} ns p99: {} ns p999: {} ns p9999: {} ns",
+                    m.get_combined_percentile(
+                        tic::Percentile("p50".to_owned(), 50.0)).unwrap_or(&0),
+                    m.get_combined_percentile(
+                        tic::Percentile("p90".to_owned(), 90.0)).unwrap_or(&0),
+                    m.get_combined_percentile(
+                        tic::Percentile("p99".to_owned(), 99.0)).unwrap_or(&0),
+                    m.get_combined_percentile(
+                        tic::Percentile("p999".to_owned(), 99.9)).unwrap_or(&0),
+                    m.get_combined_percentile(
+                        tic::Percentile("p9999".to_owned(), 99.99)).unwrap_or(&0),
+                );
     }
     println!("saving files...");
     receiver.save_files();
     println!("complete");
 }
 
-fn handle(mut socket: UdpSocket, dst: SocketAddr, clocksource: Clocksource, stats: Sender<Metric>) {
+fn handle(mut socket: UdpSocket,
+          dst: SocketAddr,
+          clocksource: Clocksource,
+          stats: Sender<Metric>) {
     let request = "PING\r\n".to_owned().into_bytes();
     let mut buffer = vec![0; 1024*2];
     loop {
@@ -164,7 +179,7 @@ impl ArgumentParser {
             let (iface, _) = self.get_iface();
             if let Some(ips) = iface.ips.as_ref() {
                 for ip in ips {
-                    if let &IpAddr::V4(ip) = ip {
+                    if let IpAddr::V4(ip) = *ip {
                         return Ipv4Network::new(ip, 24).unwrap();
                     }
                 }
@@ -222,8 +237,8 @@ impl ArgumentParser {
     pub fn create_channel(&self) -> rips::EthernetChannel {
         let (iface, _) = self.get_iface();
         let mut config = datalink::Config::default();
-        config.write_buffer_size = 1024*64;
-        config.read_buffer_size = 1024*64;
+        config.write_buffer_size = 1024 * 64;
+        config.read_buffer_size = 1024 * 64;
         match datalink::channel(&iface, config) {
             Ok(datalink::Channel::Ethernet(tx, rx)) => rips::EthernetChannel(tx, rx),
             _ => self.print_error(&format!("Unable to open network channel on {}", iface.name)),
@@ -234,12 +249,15 @@ impl ArgumentParser {
         let src_net_arg = clap::Arg::with_name("src_net")
             .long("ip")
             .value_name("CIDR")
-            .help("Local IP and prefix to send from, in CIDR format. Will default to first IP on given iface and prefix 24.")
+            .help("Local IP and prefix to send from, in CIDR format. Will default to first IP on \
+                   given iface and prefix 24.")
             .takes_value(true);
         let gw = clap::Arg::with_name("gw")
             .long("gateway")
             .value_name("IP")
-            .help("The default gateway to use if the destination is not on the local network. Must be inside the network given to --ip. Defaults to the first address in the network given to --ip")
+            .help("The default gateway to use if the destination is not on the local network. \
+                   Must be inside the network given to --ip. Defaults to the first address in \
+                   the network given to --ip")
             .takes_value(true);
         let iface_arg = clap::Arg::with_name("iface")
             .help("Network interface to use")
@@ -267,7 +285,7 @@ impl ArgumentParser {
             .takes_value(true)
             .default_value("60");
 
-        let app = clap::App::new("UDP Ping Client")
+        clap::App::new("UDP Ping Client")
             .version(crate_version!())
             .author(crate_authors!())
             .about("A simple UDP ping client with a userspace network stack")
@@ -277,9 +295,7 @@ impl ArgumentParser {
             .arg(windows)
             .arg(duration)
             .arg(iface_arg)
-            .arg(dst_arg);
-
-        app
+            .arg(dst_arg)
     }
 
     fn print_error(&self, error: &str) -> ! {
