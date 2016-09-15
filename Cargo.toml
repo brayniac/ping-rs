@@ -1,0 +1,58 @@
+[package]
+name = "ping-rs"
+version = "0.1.0"
+authors = ["Brian Martin <brayniac@gmail.com>"]
+
+license = "Apache-2.0"
+
+description = "UDP ASCII Ping client with userspace networking"
+
+homepage = "https://github.com/brayniac/ping-rs"
+repository = "https://github.com/brayniac/ping-rs"
+
+readme = "README.md"
+
+exclude = ["./lib"]
+
+[dependencies]
+clap = "^2"
+ipnetwork = "0.9.0"
+lazy_static = "^0.2"
+log = "*"
+pad = "*"
+tic = "0.0.10"
+time = "*"
+
+[dependencies.pnet]
+git = "https://github.com/libpnet/libpnet"
+
+[dependencies.rips]
+git = "https://github.com/faern/librips"
+
+[features]
+asm = [ "tic/asm" ]
+netmap = [ "pnet/netmap" ]
+
+[profile.dev]
+opt-level = 0
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 1
+
+[profile.bench]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
