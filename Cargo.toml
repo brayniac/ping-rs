@@ -18,14 +18,15 @@ exclude = ["./lib"]
 clap = "^2"
 ipnetwork = "0.9.0"
 lazy_static = "^0.2"
-tic = "0.0.10"
+log = "*"
+tic = { git = "https://github.com/brayniac/tic", branch = "master" }
 time = "*"
 
 [dependencies.pnet]
 git = "https://github.com/libpnet/libpnet"
 
 [dependencies.rips]
-git = "https://github.com/faern/librips"
+git = "https://github.com/brayniac/librips"
 
 [features]
 asm = [ "tic/asm" ]
