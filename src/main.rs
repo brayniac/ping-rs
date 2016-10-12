@@ -102,6 +102,7 @@ fn main() {
     let stats_qlen = args.get_stats_qlen();
     let dst = args.get_dst();
     let threads = args.get_threads();
+    let noop = args.get_noop();
 
     let mut stack = rips::NetworkStack::new();
     stack.add_interface(iface.clone(), channel).unwrap();
@@ -131,10 +132,16 @@ fn main() {
         let src = SocketAddr::V4(SocketAddrV4::new(src_net.ip(), (src_port + i as u16)));
         let socket = UdpSocket::bind(stack.clone(), src).unwrap();
         let dst = dst.clone();
-
-        thread::spawn(move || {
-            handle(socket, dst, clocksource, sender);
-        });
+        if noop {
+            thread::spawn(move || {
+                handle_noop(clocksource, sender);
+            });
+        } else {
+            thread::spawn(move || {
+                handle(socket, dst, clocksource, sender);
+            });
+        }
+        
     }
 
     let cs = receiver.get_clocksource();
@@ -181,6 +188,16 @@ fn handle(mut socket: UdpSocket,
         let t0 = clocksource.counter();
         let _ = socket.send_to(&request, dst);
         let (_, _) = socket.recv_from(&mut buffer).expect("Unable to read from socket");
+        let t1 = clocksource.counter();
+        let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
+    }
+}
+
+fn handle_noop(
+          clocksource: Clocksource,
+          stats: Sender<Metric>) {
+    loop {
+        let t0 = clocksource.counter();
         let t1 = clocksource.counter();
         let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
     }
@@ -296,6 +313,11 @@ impl ArgumentParser {
         }
     }
 
+    pub fn get_noop(&self) -> bool {
+        let matches = &self.matches;
+        matches.is_present("noop")
+    }
+
     pub fn create_channel(&self) -> rips::EthernetChannel {
         let (iface, _) = self.get_iface();
         let mut config = datalink::Config::default();
@@ -358,6 +380,10 @@ impl ArgumentParser {
             .help("Number of client threads to use")
             .takes_value(true)
             .default_value("1");
+        let noop = clap::Arg::with_name("noop")
+            .long("noop")
+            .help("no-op validation of stats")
+            .takes_value(false);
 
         clap::App::new("UDP Ping Client")
             .version(crate_version!())
@@ -372,6 +398,7 @@ impl ArgumentParser {
             .arg(dst_arg)
             .arg(stats_qlen)
             .arg(threads)
+            .arg(noop)
     }
 
     fn print_error(&self, error: &str) -> ! {
