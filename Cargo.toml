@@ -23,7 +23,8 @@ tic = { git = "https://github.com/brayniac/tic", branch = "master" }
 time = "*"
 
 [dependencies.pnet]
-git = "https://github.com/libpnet/libpnet"
+git = "https://github.com/faern/libpnet"
+branch = "self-owned-packets"
 
 [dependencies.rips]
 git = "https://github.com/brayniac/librips"
