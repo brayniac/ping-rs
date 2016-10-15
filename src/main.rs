@@ -148,9 +148,9 @@ fn main() {
                     handle_rips(socket, dst, clocksource, sender);
                 });
             }
-            
+
         }
-        
+
     }
 
     let cs = receiver.get_clocksource();
@@ -188,9 +188,9 @@ fn main() {
 }
 
 fn handle_rips(mut socket: UdpSocket,
-          dst: SocketAddr,
-          clocksource: Clocksource,
-          stats: Sender<Metric>) {
+               dst: SocketAddr,
+               clocksource: Clocksource,
+               stats: Sender<Metric>) {
     let request = "PING\r\n".to_owned().into_bytes();
     let mut buffer = vec![0; 1024*2];
     loop {
@@ -203,9 +203,9 @@ fn handle_rips(mut socket: UdpSocket,
 }
 
 fn handle_stdnet(mut socket: std::net::UdpSocket,
-          dst: SocketAddr,
-          clocksource: Clocksource,
-          stats: Sender<Metric>) {
+                 dst: SocketAddr,
+                 clocksource: Clocksource,
+                 stats: Sender<Metric>) {
     let request = "PING\r\n".to_owned().into_bytes();
     let mut buffer = vec![0; 1024*2];
     loop {
@@ -217,9 +217,7 @@ fn handle_stdnet(mut socket: std::net::UdpSocket,
     }
 }
 
-fn handle_noop(
-          clocksource: Clocksource,
-          stats: Sender<Metric>) {
+fn handle_noop(clocksource: Clocksource, stats: Sender<Metric>) {
     loop {
         let t0 = clocksource.counter();
         let t1 = clocksource.counter();
