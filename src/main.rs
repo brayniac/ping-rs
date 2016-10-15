@@ -120,7 +120,7 @@ fn main() {
         .windows(windows)
         .duration(duration)
         .capacity(stats_qlen)
-        .http_listen("localhost:42024".to_owned())
+        .http_listen("0.0.0.0:42024".to_owned())
         .build();
 
     receiver.add_interest(Interest::Waterfall(Metric::Ok, "ok_waterfall.png".to_owned()));
