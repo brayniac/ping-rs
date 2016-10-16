@@ -167,8 +167,8 @@ fn main() {
             total = *t;
         }
         let r = c as f64 / ((t1 - t0) as f64 / 1_000_000_000.0);
-        println!("rate: {} rps", r);
-        println!("latency: p50: {} ns p90: {} ns p99: {} ns p999: {} ns p9999: {} ns",
+        info!("rate: {} rps", r);
+        info!("latency: p50: {} ns p90: {} ns p99: {} ns p999: {} ns p9999: {} ns",
                     m.get_combined_percentile(
                         tic::Percentile("p50".to_owned(), 50.0)).unwrap_or(&0),
                     m.get_combined_percentile(
@@ -181,9 +181,9 @@ fn main() {
                         tic::Percentile("p9999".to_owned(), 99.99)).unwrap_or(&0),
                 );
     }
-    println!("saving files...");
+    info!("saving files...");
     receiver.save_files();
-    println!("complete");
+    info!("complete");
 }
 
 fn handle_rips(mut socket: UdpSocket,
