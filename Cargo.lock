@@ -8,7 +8,7 @@ dependencies = [
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "pnet 0.13.0 (git+https://github.com/faern/libpnet?branch=working-stack)",
  "rips 0.0.0 (git+https://github.com/brayniac/librips)",
- "tic 0.0.11-pre (git+https://github.com/brayniac/tic)",
+ "tic 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -467,8 +467,8 @@ dependencies = [
 
 [[package]]
 name = "tic"
-version = "0.0.11-pre"
-source = "git+https://github.com/brayniac/tic#d3ac1999b51dfccc3d92a20c681906593a6058f6"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "clocksource 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "heatmap 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -638,7 +638,7 @@ dependencies = [
 "checksum term_size 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "3f7f5f3f71b0040cecc71af239414c23fd3c73570f5ff54cf50e03cef637f2a0"
 "checksum thread-id 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a9539db560102d1cef46b8b78ce737ff0bb64e7e18d35b2a5688f7d097d0ff03"
 "checksum thread_local 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)" = "8576dbbfcaef9641452d5cf0df9b0e7eeab7694956dd33bb61515fb8f18cfdd5"
-"checksum tic 0.0.11-pre (git+https://github.com/brayniac/tic)" = "<none>"
+"checksum tic 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)" = "37f1172e3e61b225467728c6eaab6e9c279d0e3e271e6766e9852f5a717ec4ef"
 "checksum time 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)" = "3c7ec6d62a20df54e07ab3b78b9a3932972f4b7981de295563686849eb3989af"
 "checksum tiny_http 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)" = "c7cc3dc9c1c017fc18f8a6a9c7133914813a8186cd41b3342c2e503dd0ef26d6"
 "checksum unicode-segmentation 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "b905d0fc2a1f0befd86b0e72e31d1787944efef9d38b9358a9e92a69757f7e3b"

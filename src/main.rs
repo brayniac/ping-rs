@@ -94,26 +94,22 @@ fn main() {
         let sender = receiver.get_sender();
         let clocksource = receiver.get_clocksource();
         let src = SocketAddr::V4(SocketAddrV4::new(src_net.ip(), 0));
-        let dst = dst.clone();
+        let dst = dst;
         if noop {
             thread::spawn(move || {
                 handle_noop(clocksource, sender);
             });
+        } else if stdnet {
+            let socket = std::net::UdpSocket::bind(src).unwrap();
+            thread::spawn(move || {
+                handle_stdnet(socket, dst, clocksource, sender);
+            });
         } else {
-            if stdnet {
-                let socket = std::net::UdpSocket::bind(src).unwrap();
-                thread::spawn(move || {
-                    handle_stdnet(socket, dst, clocksource, sender);
-                });
-            } else {
-                let socket = UdpSocket::bind(stack.clone(), src).unwrap();
-                thread::spawn(move || {
-                    handle_rips(socket, dst, clocksource, sender);
-                });
-            }
-
+            let socket = UdpSocket::bind(stack.clone(), src).unwrap();
+            thread::spawn(move || {
+                handle_rips(socket, dst, clocksource, sender);
+            });
         }
-
     }
 
     let cs = receiver.get_clocksource();
@@ -165,7 +161,7 @@ fn handle_rips(mut socket: UdpSocket,
     }
 }
 
-fn handle_stdnet(mut socket: std::net::UdpSocket,
+fn handle_stdnet(socket: std::net::UdpSocket,
                  dst: SocketAddr,
                  clocksource: Clocksource,
                  stats: Sender<Metric>) {
@@ -205,7 +201,7 @@ impl ArgumentParser {
 
     pub fn get_iface(&self) -> (NetworkInterface, rips::Interface) {
         let iface_name = self.matches.value_of("iface").unwrap();
-        for iface in datalink::interfaces().into_iter() {
+        for iface in datalink::interfaces() {
             if iface.name == iface_name {
                 if let Ok(rips_iface) = rips::convert_interface(&iface) {
                     return (iface, rips_iface);
