@@ -13,7 +13,7 @@ cargo build --release
 sudo ./target/release/ping-rs --ip 10.138.0.2/32 --gateway 10.138.0.1 eth0 10.138.0.3:12221
 ```
 
-With nightly rust, you may use the 'asm' feature to provide lower-cost timestamping of events:
+Optimized event timestamping. WARNING: this adds platform specific optimizations!!! Only tested on Intel x86_64. This assumes the constant_tsc feature is available on your particular CPU. Beware of potential for incorrect metrics if the assumptions do not hold.
 ```shell
 git clone https://github.com/brayniac/ping-rs
 cargo build --release --features asm
@@ -24,7 +24,7 @@ Upon completion, a 'ok_waterfall.png' will be created with the full latency dist
 
 ## Features
 
-* simple ASCII ping client
+* over-engineered ASCII ping client
 * userspace UDP implementation
 * stats to measure performance
 
