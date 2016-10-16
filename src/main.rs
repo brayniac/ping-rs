@@ -10,8 +10,6 @@ extern crate rips;
 extern crate tic;
 extern crate time;
 
-use log::{LogLevel, LogLevelFilter, LogMetadata, LogRecord};
-
 use std::fmt;
 use std::io::Write;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, SocketAddrV4};
@@ -25,42 +23,8 @@ use pnet::datalink::{self, NetworkInterface};
 use rips::udp::UdpSocket;
 use tic::{Clocksource, Interest, Receiver, Sample, Sender};
 
-pub struct SimpleLogger;
-
-impl log::Log for SimpleLogger {
-    fn enabled(&self, metadata: &LogMetadata) -> bool {
-        metadata.level() <= LogLevel::Trace
-    }
-
-    fn log(&self, record: &LogRecord) {
-        if record.target() == "ping_rs" && self.enabled(record.metadata()) {
-            println!("{} {:<5} [{}] {}",
-                     time::strftime("%Y-%m-%d %H:%M:%S", &time::now()).unwrap(),
-                     record.level().to_string(),
-                     record.target().to_string(),
-                     record.args());
-        }
-    }
-}
-
-fn set_log_level(level: usize) {
-    let log_filter;
-    match level {
-        0 => {
-            log_filter = LogLevelFilter::Info;
-        }
-        1 => {
-            log_filter = LogLevelFilter::Debug;
-        }
-        _ => {
-            log_filter = LogLevelFilter::Trace;
-        }
-    }
-    let _ = log::set_logger(|max_log_level| {
-        max_log_level.set(log_filter);
-        Box::new(SimpleLogger)
-    });
-}
+mod logging;
+use logging::set_log_level;
 
 lazy_static! {
     static ref DEFAULT_ROUTE: Ipv4Network = Ipv4Network::from_cidr("0.0.0.0/0").unwrap();
