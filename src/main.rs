@@ -1,4 +1,6 @@
 #[macro_use]
+extern crate log;
+#[macro_use]
 extern crate clap;
 #[macro_use]
 extern crate lazy_static;
@@ -7,6 +9,8 @@ extern crate pnet;
 extern crate rips;
 extern crate tic;
 extern crate time;
+
+use log::{LogLevel, LogLevelFilter, LogMetadata, LogRecord};
 
 use std::fmt;
 use std::io::Write;
@@ -21,6 +25,42 @@ use pnet::datalink::{self, NetworkInterface};
 use rips::udp::UdpSocket;
 use tic::{Clocksource, Interest, Receiver, Sample, Sender};
 
+pub struct SimpleLogger;
+
+impl log::Log for SimpleLogger {
+    fn enabled(&self, metadata: &LogMetadata) -> bool {
+        metadata.level() <= LogLevel::Trace
+    }
+
+    fn log(&self, record: &LogRecord) {
+        if record.target() == "ping_rs" && self.enabled(record.metadata()) {
+            println!("{} {:<5} [{}] {}",
+                     time::strftime("%Y-%m-%d %H:%M:%S", &time::now()).unwrap(),
+                     record.level().to_string(),
+                     record.target().to_string(),
+                     record.args());
+        }
+    }
+}
+
+fn set_log_level(level: usize) {
+    let log_filter;
+    match level {
+        0 => {
+            log_filter = LogLevelFilter::Info;
+        }
+        1 => {
+            log_filter = LogLevelFilter::Debug;
+        }
+        _ => {
+            log_filter = LogLevelFilter::Trace;
+        }
+    }
+    let _ = log::set_logger(|max_log_level| {
+        max_log_level.set(log_filter);
+        Box::new(SimpleLogger)
+    });
+}
 
 lazy_static! {
     static ref DEFAULT_ROUTE: Ipv4Network = Ipv4Network::from_cidr("0.0.0.0/0").unwrap();
@@ -49,6 +89,7 @@ impl fmt::Display for Metric {
 }
 
 fn main() {
+    set_log_level(0);
     let args = ArgumentParser::new();
 
     let (_, iface) = args.get_iface();
@@ -58,8 +99,11 @@ fn main() {
     let channel = args.create_channel();
     let duration = args.get_duration();
     let windows = args.get_windows();
-    let src = SocketAddr::V4(SocketAddrV4::new(src_net.ip(), src_port));
+    let stats_qlen = args.get_stats_qlen();
     let dst = args.get_dst();
+    let threads = args.get_threads();
+    let noop = args.get_noop();
+    let stdnet = args.get_stdnet();
 
     let mut stack = rips::NetworkStack::new();
     stack.add_interface(iface.clone(), channel).unwrap();
@@ -70,26 +114,44 @@ fn main() {
     }
 
     let stack = Arc::new(Mutex::new(stack));
-    let socket = UdpSocket::bind(stack, src).unwrap();
 
-    // initialize a tic::Receiver to injest stats
+    // initialize a tic::Receiver to ingest stats
     let mut receiver = Receiver::configure()
         .windows(windows)
         .duration(duration)
-        .capacity(100_000)
-        .http_listen("localhost:42024".to_owned())
+        .capacity(stats_qlen)
+        .http_listen("0.0.0.0:42024".to_owned())
         .build();
 
     receiver.add_interest(Interest::Waterfall(Metric::Ok, "ok_waterfall.png".to_owned()));
     receiver.add_interest(Interest::Trace(Metric::Ok, "ok_trace.txt".to_owned()));
     receiver.add_interest(Interest::Count(Metric::Ok));
 
-    let sender = receiver.get_sender();
-    let clocksource = receiver.get_clocksource();
+    for i in 0..threads {
+        let sender = receiver.get_sender();
+        let clocksource = receiver.get_clocksource();
+        let src = SocketAddr::V4(SocketAddrV4::new(src_net.ip(), (src_port + i as u16)));
+        let dst = dst.clone();
+        if noop {
+            thread::spawn(move || {
+                handle_noop(clocksource, sender);
+            });
+        } else {
+            if stdnet {
+                let socket = std::net::UdpSocket::bind(src).unwrap();
+                thread::spawn(move || {
+                    handle_stdnet(socket, dst, clocksource, sender);
+                });
+            } else {
+                let socket = UdpSocket::bind(stack.clone(), src).unwrap();
+                thread::spawn(move || {
+                    handle_rips(socket, dst, clocksource, sender);
+                });
+            }
 
-    thread::spawn(move || {
-        handle(socket, dst, clocksource, sender);
-    });
+        }
+
+    }
 
     let cs = receiver.get_clocksource();
 
@@ -125,16 +187,39 @@ fn main() {
     println!("complete");
 }
 
-fn handle(mut socket: UdpSocket,
-          dst: SocketAddr,
-          clocksource: Clocksource,
-          stats: Sender<Metric>) {
+fn handle_rips(mut socket: UdpSocket,
+               dst: SocketAddr,
+               clocksource: Clocksource,
+               stats: Sender<Metric>) {
     let request = "PING\r\n".to_owned().into_bytes();
     let mut buffer = vec![0; 1024*2];
     loop {
         let t0 = clocksource.counter();
         let _ = socket.send_to(&request, dst);
         let (_, _) = socket.recv_from(&mut buffer).expect("Unable to read from socket");
+        let t1 = clocksource.counter();
+        let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
+    }
+}
+
+fn handle_stdnet(mut socket: std::net::UdpSocket,
+                 dst: SocketAddr,
+                 clocksource: Clocksource,
+                 stats: Sender<Metric>) {
+    let request = "PING\r\n".to_owned().into_bytes();
+    let mut buffer = vec![0; 1024*2];
+    loop {
+        let t0 = clocksource.counter();
+        let _ = socket.send_to(&request, dst);
+        let (_, _) = socket.recv_from(&mut buffer).expect("Unable to read from socket");
+        let t1 = clocksource.counter();
+        let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
+    }
+}
+
+fn handle_noop(clocksource: Clocksource, stats: Sender<Metric>) {
+    loop {
+        let t0 = clocksource.counter();
         let t1 = clocksource.counter();
         let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
     }
@@ -234,6 +319,32 @@ impl ArgumentParser {
         }
     }
 
+    pub fn get_stats_qlen(&self) -> usize {
+        let matches = &self.matches;
+        match value_t!(matches, "stats-qlen", usize) {
+            Ok(v) => v,
+            Err(e) => self.print_error(&format!("Invalid duration param. {}", e)),
+        }
+    }
+
+    pub fn get_threads(&self) -> usize {
+        let matches = &self.matches;
+        match value_t!(matches, "threads", usize) {
+            Ok(v) => v,
+            Err(e) => self.print_error(&format!("Invalid duration param. {}", e)),
+        }
+    }
+
+    pub fn get_noop(&self) -> bool {
+        let matches = &self.matches;
+        matches.is_present("noop")
+    }
+
+    pub fn get_stdnet(&self) -> bool {
+        let matches = &self.matches;
+        matches.is_present("stdnet")
+    }
+
     pub fn create_channel(&self) -> rips::EthernetChannel {
         let (iface, _) = self.get_iface();
         let mut config = datalink::Config::default();
@@ -284,6 +395,26 @@ impl ArgumentParser {
             .help("Seconds per integration window")
             .takes_value(true)
             .default_value("60");
+        let stats_qlen = clap::Arg::with_name("stats-qlen")
+            .long("stats-qlen")
+            .value_name("COUNT")
+            .help("Capacity of the stats queue")
+            .takes_value(true)
+            .default_value("1024");
+        let threads = clap::Arg::with_name("threads")
+            .long("threads")
+            .value_name("COUNT")
+            .help("Number of client threads to use")
+            .takes_value(true)
+            .default_value("1");
+        let noop = clap::Arg::with_name("noop")
+            .long("noop")
+            .help("no-op validation of stats")
+            .takes_value(false);
+        let stdnet = clap::Arg::with_name("stdnet")
+            .long("stdnet")
+            .help("use std::net::UdpSocket")
+            .takes_value(false);
 
         clap::App::new("UDP Ping Client")
             .version(crate_version!())
@@ -296,6 +427,10 @@ impl ArgumentParser {
             .arg(duration)
             .arg(iface_arg)
             .arg(dst_arg)
+            .arg(stats_qlen)
+            .arg(threads)
+            .arg(noop)
+            .arg(stdnet)
     }
 
     fn print_error(&self, error: &str) -> ! {
