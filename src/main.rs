@@ -95,7 +95,6 @@ fn main() {
     let (_, iface) = args.get_iface();
     let src_net = args.get_src_net();
     let gateway = args.get_gw();
-    let src_port = args.get_src_port();
     let channel = args.create_channel();
     let duration = args.get_duration();
     let windows = args.get_windows();
@@ -127,10 +126,10 @@ fn main() {
     receiver.add_interest(Interest::Trace(Metric::Ok, "ok_trace.txt".to_owned()));
     receiver.add_interest(Interest::Count(Metric::Ok));
 
-    for i in 0..threads {
+    for _ in 0..threads {
         let sender = receiver.get_sender();
         let clocksource = receiver.get_clocksource();
-        let src = SocketAddr::V4(SocketAddrV4::new(src_net.ip(), (src_port + i as u16)));
+        let src = SocketAddr::V4(SocketAddrV4::new(src_net.ip(), 0));
         let dst = dst.clone();
         if noop {
             thread::spawn(move || {
@@ -273,11 +272,6 @@ impl ArgumentParser {
         }
     }
 
-    pub fn get_src_port(&self) -> u16 {
-        let matches = &self.matches;
-        value_t!(matches, "src_port", u16).unwrap()
-    }
-
     pub fn get_gw(&self) -> Ipv4Addr {
         if let Some(gw_str) = self.matches.value_of("gw") {
             if let Ok(gw) = Ipv4Addr::from_str(gw_str) {
@@ -374,11 +368,6 @@ impl ArgumentParser {
             .help("Network interface to use")
             .required(true)
             .index(1);
-        let src_port_arg = clap::Arg::with_name("src_port")
-            .long("sport")
-            .value_name("PORT")
-            .help("Local port to bind to and send from.")
-            .default_value("12321");
         let dst_arg = clap::Arg::with_name("target")
             .help("Target to connect to. Given as <ip>:<port>")
             .required(true)
@@ -421,7 +410,6 @@ impl ArgumentParser {
             .author(crate_authors!())
             .about("A simple UDP ping client with a userspace network stack")
             .arg(src_net_arg)
-            .arg(src_port_arg)
             .arg(gw)
             .arg(windows)
             .arg(duration)
