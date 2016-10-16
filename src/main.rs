@@ -10,8 +10,6 @@ extern crate rips;
 extern crate tic;
 extern crate time;
 
-use log::{LogLevel, LogLevelFilter, LogMetadata, LogRecord};
-
 use std::fmt;
 use std::io::Write;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, SocketAddrV4};
@@ -25,42 +23,8 @@ use pnet::datalink::{self, NetworkInterface};
 use rips::udp::UdpSocket;
 use tic::{Clocksource, Interest, Receiver, Sample, Sender};
 
-pub struct SimpleLogger;
-
-impl log::Log for SimpleLogger {
-    fn enabled(&self, metadata: &LogMetadata) -> bool {
-        metadata.level() <= LogLevel::Trace
-    }
-
-    fn log(&self, record: &LogRecord) {
-        if record.target() == "ping_rs" && self.enabled(record.metadata()) {
-            println!("{} {:<5} [{}] {}",
-                     time::strftime("%Y-%m-%d %H:%M:%S", &time::now()).unwrap(),
-                     record.level().to_string(),
-                     record.target().to_string(),
-                     record.args());
-        }
-    }
-}
-
-fn set_log_level(level: usize) {
-    let log_filter;
-    match level {
-        0 => {
-            log_filter = LogLevelFilter::Info;
-        }
-        1 => {
-            log_filter = LogLevelFilter::Debug;
-        }
-        _ => {
-            log_filter = LogLevelFilter::Trace;
-        }
-    }
-    let _ = log::set_logger(|max_log_level| {
-        max_log_level.set(log_filter);
-        Box::new(SimpleLogger)
-    });
-}
+mod logging;
+use logging::set_log_level;
 
 lazy_static! {
     static ref DEFAULT_ROUTE: Ipv4Network = Ipv4Network::from_cidr("0.0.0.0/0").unwrap();
@@ -95,7 +59,6 @@ fn main() {
     let (_, iface) = args.get_iface();
     let src_net = args.get_src_net();
     let gateway = args.get_gw();
-    let src_port = args.get_src_port();
     let channel = args.create_channel();
     let duration = args.get_duration();
     let windows = args.get_windows();
@@ -127,10 +90,10 @@ fn main() {
     receiver.add_interest(Interest::Trace(Metric::Ok, "ok_trace.txt".to_owned()));
     receiver.add_interest(Interest::Count(Metric::Ok));
 
-    for i in 0..threads {
+    for _ in 0..threads {
         let sender = receiver.get_sender();
         let clocksource = receiver.get_clocksource();
-        let src = SocketAddr::V4(SocketAddrV4::new(src_net.ip(), (src_port + i as u16)));
+        let src = SocketAddr::V4(SocketAddrV4::new(src_net.ip(), 0));
         let dst = dst.clone();
         if noop {
             thread::spawn(move || {
@@ -168,8 +131,8 @@ fn main() {
             total = *t;
         }
         let r = c as f64 / ((t1 - t0) as f64 / 1_000_000_000.0);
-        println!("rate: {} rps", r);
-        println!("latency: p50: {} ns p90: {} ns p99: {} ns p999: {} ns p9999: {} ns",
+        info!("rate: {} rps", r);
+        info!("latency: p50: {} ns p90: {} ns p99: {} ns p999: {} ns p9999: {} ns",
                     m.get_combined_percentile(
                         tic::Percentile("p50".to_owned(), 50.0)).unwrap_or(&0),
                     m.get_combined_percentile(
@@ -182,9 +145,9 @@ fn main() {
                         tic::Percentile("p9999".to_owned(), 99.99)).unwrap_or(&0),
                 );
     }
-    println!("saving files...");
+    info!("saving files...");
     receiver.save_files();
-    println!("complete");
+    info!("complete");
 }
 
 fn handle_rips(mut socket: UdpSocket,
@@ -271,11 +234,6 @@ impl ArgumentParser {
             }
             self.print_error("No IPv4 to use on given interface");
         }
-    }
-
-    pub fn get_src_port(&self) -> u16 {
-        let matches = &self.matches;
-        value_t!(matches, "src_port", u16).unwrap()
     }
 
     pub fn get_gw(&self) -> Ipv4Addr {
@@ -374,11 +332,6 @@ impl ArgumentParser {
             .help("Network interface to use")
             .required(true)
             .index(1);
-        let src_port_arg = clap::Arg::with_name("src_port")
-            .long("sport")
-            .value_name("PORT")
-            .help("Local port to bind to and send from.")
-            .default_value("12321");
         let dst_arg = clap::Arg::with_name("target")
             .help("Target to connect to. Given as <ip>:<port>")
             .required(true)
@@ -421,7 +374,6 @@ impl ArgumentParser {
             .author(crate_authors!())
             .about("A simple UDP ping client with a userspace network stack")
             .arg(src_net_arg)
-            .arg(src_port_arg)
             .arg(gw)
             .arg(windows)
             .arg(duration)
