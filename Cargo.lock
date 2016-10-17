@@ -6,7 +6,7 @@ dependencies = [
  "ipnetwork 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "pnet 0.13.0 (git+https://github.com/faern/libpnet?branch=working-stack)",
+ "pnet 0.13.0 (git+https://github.com/brayniac/libpnet?branch=working-stack)",
  "rips 0.0.0 (git+https://github.com/brayniac/librips)",
  "tic 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -31,7 +31,7 @@ version = "0.3.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "nodrop 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "odds 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
+ "odds 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -155,7 +155,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "gcc"
-version = "0.3.35"
+version = "0.3.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -238,7 +238,7 @@ name = "netmap_sys"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "gcc 0.3.35 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gcc 0.3.37 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -247,7 +247,7 @@ name = "nodrop"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "odds 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
+ "odds 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -284,18 +284,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "odds"
-version = "0.2.22"
+version = "0.2.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "pnet"
 version = "0.13.0"
-source = "git+https://github.com/faern/libpnet?branch=working-stack#f89927b97ff2fe9ad90eac5f298e08f387f4b19b"
+source = "git+https://github.com/brayniac/libpnet?branch=working-stack#c3bf2540599809a0849e7d6582bfa3a347b08255"
 dependencies = [
  "libc 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "netmap_sys 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "pnet_macros 0.11.0 (git+https://github.com/faern/libpnet?branch=working-stack)",
- "pnet_macros_support 0.1.1 (git+https://github.com/faern/libpnet?branch=working-stack)",
+ "pnet_macros 0.11.0 (git+https://github.com/brayniac/libpnet?branch=working-stack)",
+ "pnet_macros_support 0.1.1 (git+https://github.com/brayniac/libpnet?branch=working-stack)",
  "syntex 0.42.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "ws2_32-sys 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -304,7 +304,7 @@ dependencies = [
 [[package]]
 name = "pnet_macros"
 version = "0.11.0"
-source = "git+https://github.com/faern/libpnet?branch=working-stack#f89927b97ff2fe9ad90eac5f298e08f387f4b19b"
+source = "git+https://github.com/brayniac/libpnet?branch=working-stack#c3bf2540599809a0849e7d6582bfa3a347b08255"
 dependencies = [
  "regex 0.1.77 (registry+https://github.com/rust-lang/crates.io-index)",
  "syntex 0.42.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -314,7 +314,7 @@ dependencies = [
 [[package]]
 name = "pnet_macros_support"
 version = "0.1.1"
-source = "git+https://github.com/faern/libpnet?branch=working-stack#f89927b97ff2fe9ad90eac5f298e08f387f4b19b"
+source = "git+https://github.com/brayniac/libpnet?branch=working-stack#c3bf2540599809a0849e7d6582bfa3a347b08255"
 
 [[package]]
 name = "rand"
@@ -344,11 +344,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "rips"
 version = "0.0.0"
-source = "git+https://github.com/brayniac/librips#2da7dd38544732c896288f1eae56f9933aa8e062"
+source = "git+https://github.com/brayniac/librips#000e94357343f1ac0d85fafc19b3512369467117"
 dependencies = [
  "ipnetwork 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "pnet 0.13.0 (git+https://github.com/faern/libpnet?branch=working-stack)",
+ "pnet 0.13.0 (git+https://github.com/brayniac/libpnet?branch=working-stack)",
  "rand 0.3.14 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -598,7 +598,7 @@ dependencies = [
 "checksum encoding-index-singlebyte 1.20141219.5 (registry+https://github.com/rust-lang/crates.io-index)" = "3351d5acffb224af9ca265f435b859c7c01537c0849754d3db3fdf2bfe2ae84a"
 "checksum encoding-index-tradchinese 1.20141219.5 (registry+https://github.com/rust-lang/crates.io-index)" = "fd0e20d5688ce3cab59eb3ef3a2083a5c77bf496cb798dc6fcdb75f323890c18"
 "checksum encoding_index_tests 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "a246d82be1c9d791c5dfde9a2bd045fc3cbba3fa2b11ad558f27d01712f00569"
-"checksum gcc 0.3.35 (registry+https://github.com/rust-lang/crates.io-index)" = "91ecd03771effb0c968fd6950b37e89476a578aaf1c70297d8e92b6516ec3312"
+"checksum gcc 0.3.37 (registry+https://github.com/rust-lang/crates.io-index)" = "41337e9dc80ebadf36b4f252bf7440f61bcf34f99caa170e50dcd0f9a0cdb5d8"
 "checksum heatmap 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)" = "30ddbd78282c1517b5f6d87ffb18d865aeb79d4a41a8844acc1150c8a7da4a92"
 "checksum histogram 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)" = "e065d135dec2482a922c68dee6d15c748774df6e15fc9f332708d7a1ccf409b1"
 "checksum hsl 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "575fb7f1167f3b88ed825e90eb14918ac460461fdeaa3965c6a50951dee1c970"
@@ -617,10 +617,10 @@ dependencies = [
 "checksum num-integer 0.1.32 (registry+https://github.com/rust-lang/crates.io-index)" = "fb24d9bfb3f222010df27995441ded1e954f8f69cd35021f6bef02ca9552fb92"
 "checksum num-iter 0.1.32 (registry+https://github.com/rust-lang/crates.io-index)" = "287a1c9969a847055e1122ec0ea7a5c5d6f72aad97934e131c83d5c08ab4e45c"
 "checksum num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)" = "a16a42856a256b39c6d3484f097f6713e14feacd9bfb02290917904fae46c81c"
-"checksum odds 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)" = "308eb922caa165a2c4be8004abf87822fc4b444ab339f70fc172236b1905efb0"
-"checksum pnet 0.13.0 (git+https://github.com/faern/libpnet?branch=working-stack)" = "<none>"
-"checksum pnet_macros 0.11.0 (git+https://github.com/faern/libpnet?branch=working-stack)" = "<none>"
-"checksum pnet_macros_support 0.1.1 (git+https://github.com/faern/libpnet?branch=working-stack)" = "<none>"
+"checksum odds 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)" = "e04630a62b3f1cc8c58b4d8f2555a40136f02b420e158242936ef286a72d33a0"
+"checksum pnet 0.13.0 (git+https://github.com/brayniac/libpnet?branch=working-stack)" = "<none>"
+"checksum pnet_macros 0.11.0 (git+https://github.com/brayniac/libpnet?branch=working-stack)" = "<none>"
+"checksum pnet_macros_support 0.1.1 (git+https://github.com/brayniac/libpnet?branch=working-stack)" = "<none>"
 "checksum rand 0.3.14 (registry+https://github.com/rust-lang/crates.io-index)" = "2791d88c6defac799c3f20d74f094ca33b9332612d9aef9078519c82e4fe04a5"
 "checksum regex 0.1.77 (registry+https://github.com/rust-lang/crates.io-index)" = "64b03446c466d35b42f2a8b203c8e03ed8b91c0f17b56e1f84f7210a257aa665"
 "checksum regex-syntax 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)" = "48f0573bcee95a48da786f8823465b5f2a1fae288a55407aca991e5b3e0eae11"
