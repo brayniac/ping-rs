@@ -31,7 +31,7 @@ git = "https://github.com/brayniac/librips"
 
 [features]
 asm = [ "tic/asm" ]
-netmap = [ "pnet/netmap" ]
+netmap = [ "pnet/netmap", "rips/netmap" ]
 
 [profile.dev]
 opt-level = 0
