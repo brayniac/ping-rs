@@ -91,6 +91,7 @@ fn main() {
     receiver.add_interest(Interest::Waterfall(Metric::Ok, "ok_waterfall.png".to_owned()));
     receiver.add_interest(Interest::Trace(Metric::Ok, "ok_trace.txt".to_owned()));
     receiver.add_interest(Interest::Count(Metric::Ok));
+    receiver.add_interest(Interest::Percentile(Metric::Ok));
 
     for _ in 0..threads {
         let sender = receiver.get_sender();
