@@ -124,22 +124,27 @@ fn main() {
         let t1 = cs.time();
         let m = receiver.clone_meters();
         let mut c = 0;
-        if let Some(t) = m.get_combined_count() {
+        if let Some(t) = m.get_count(&Metric::Ok) {
             c = *t - total;
             total = *t;
         }
         let r = c as f64 / ((t1 - t0) as f64 / 1_000_000_000.0);
         info!("rate: {} rps", r);
         info!("latency: p50: {} ns p90: {} ns p99: {} ns p999: {} ns p9999: {} ns",
-                    m.get_combined_percentile(
+                    m.get_percentile(
+                        &Metric::Ok,
                         tic::Percentile("p50".to_owned(), 50.0)).unwrap_or(&0),
-                    m.get_combined_percentile(
+                    m.get_percentile(
+                        &Metric::Ok,
                         tic::Percentile("p90".to_owned(), 90.0)).unwrap_or(&0),
-                    m.get_combined_percentile(
+                    m.get_percentile(
+                        &Metric::Ok,
                         tic::Percentile("p99".to_owned(), 99.0)).unwrap_or(&0),
-                    m.get_combined_percentile(
+                    m.get_percentile(
+                        &Metric::Ok,
                         tic::Percentile("p999".to_owned(), 99.9)).unwrap_or(&0),
-                    m.get_combined_percentile(
+                    m.get_percentile(
+                        &Metric::Ok,
                         tic::Percentile("p9999".to_owned(), 99.99)).unwrap_or(&0),
                 );
     }
