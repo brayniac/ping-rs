@@ -42,12 +42,14 @@ macro_rules! eprintln {
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Metric {
     Ok,
+    Error,
 }
 
 impl fmt::Display for Metric {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Metric::Ok => write!(f, "ok"),
+            Metric::Error => write!(f, "error"),
         }
     }
 }
@@ -157,7 +159,13 @@ fn handle_rips(mut socket: UdpSocket,
         let _ = socket.send_to(&request, dst);
         let (_, _) = socket.recv_from(&mut buffer).expect("Unable to read from socket");
         let t1 = clocksource.counter();
-        let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
+
+        if &buffer[0..6] == b"PONG\r\n" {
+            let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
+        } else {
+            let _ = stats.send(Sample::new(t0, t1, Metric::Error));
+        }
+
     }
 }
 
@@ -172,7 +180,12 @@ fn handle_stdnet(socket: std::net::UdpSocket,
         let _ = socket.send_to(&request, dst);
         let (_, _) = socket.recv_from(&mut buffer).expect("Unable to read from socket");
         let t1 = clocksource.counter();
-        let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
+
+        if &buffer[0..6] == b"PONG\r\n" {
+            let _ = stats.send(Sample::new(t0, t1, Metric::Ok));
+        } else {
+            let _ = stats.send(Sample::new(t0, t1, Metric::Error));
+        }
     }
 }
 

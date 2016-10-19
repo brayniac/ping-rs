@@ -344,7 +344,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "rips"
 version = "0.0.0"
-source = "git+https://github.com/brayniac/librips#000e94357343f1ac0d85fafc19b3512369467117"
+source = "git+https://github.com/brayniac/librips#64ebc52dd1b91a71041dcfeb7485ae7fa059552e"
 dependencies = [
  "ipnetwork 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
