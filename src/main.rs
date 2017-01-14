@@ -53,7 +53,7 @@ impl fmt::Display for Metric {
 }
 
 fn main() {
-    set_log_level(1);
+    set_log_level(2);
     let args = ArgumentParser::new();
 
     let (_, iface) = args.get_iface();
