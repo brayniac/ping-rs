@@ -11,7 +11,7 @@ impl log::Log for SimpleLogger {
     }
 
     fn log(&self, record: &LogRecord) {
-        if record.target() == "ping_rs" && self.enabled(record.metadata()) {
+        if self.enabled(record.metadata()) {
             println!("{} {:<5} [{}] {}",
                      time::strftime("%Y-%m-%d %H:%M:%S", &time::now()).unwrap(),
                      record.level().to_string(),
