@@ -16,18 +16,16 @@ exclude = ["./lib"]
 
 [dependencies]
 clap = "^2"
-ipnetwork = "0.9.0"
+ipnetwork = "=0.10.0"
 lazy_static = "^0.2"
 log = "0.3.6"
 tic = "=0.0.10"
 time = "0.1.35"
-
-[dependencies.pnet]
-git = "https://github.com/brayniac/libpnet"
-branch = "working-stack"
+pnet = "0.15.0"
 
 [dependencies.rips]
-git = "https://github.com/brayniac/librips"
+git = "https://github.com/brayniac/rips"
+branch = "netmap"
 
 [features]
 asm = [ "tic/asm" ]

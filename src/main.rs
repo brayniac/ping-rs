@@ -27,7 +27,7 @@ mod logging;
 use logging::set_log_level;
 
 lazy_static! {
-    static ref DEFAULT_ROUTE: Ipv4Network = Ipv4Network::from_cidr("0.0.0.0/0").unwrap();
+    static ref DEFAULT_ROUTE: Ipv4Network = "0.0.0.0/0".parse().unwrap();
 }
 
 macro_rules! eprintln {
@@ -215,7 +215,7 @@ impl ArgumentParser {
 
     pub fn get_src_net(&self) -> Ipv4Network {
         if let Some(src_net) = self.matches.value_of("src_net") {
-            match Ipv4Network::from_cidr(src_net) {
+            match src_net.parse() {
                 Ok(src_net) => src_net,
                 Err(_) => self.print_error("Invalid CIDR"),
             }
