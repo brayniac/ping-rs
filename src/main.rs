@@ -48,7 +48,7 @@ pub enum Metric {
 impl fmt::Display for Metric {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Metric::Ok => write!(f, "ok"),
+            Metric::Ok => write!(f, "response_ok"),
         }
     }
 }
