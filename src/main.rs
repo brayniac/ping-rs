@@ -7,6 +7,7 @@ extern crate lazy_static;
 extern crate ipnetwork;
 extern crate pnet;
 extern crate rips;
+extern crate smoltcp;
 extern crate tic;
 extern crate time;
 
